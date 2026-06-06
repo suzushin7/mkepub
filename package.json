@@ -1,0 +1,25 @@
+{
+  "name": "mkepub",
+  "module": "src/index.ts",
+  "bin": {
+    "mkepub": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts"
+  },
+  "type": "module",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/mime-types": "^3.0.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "jszip": "^3.10.1",
+    "marked": "^18.0.5",
+    "mime-types": "^3.0.2"
+  }
+}

@@ -1,0 +1,46 @@
+@charset "utf-8";
+
+body {
+  background-color: #fafafa;
+  color: #2c3e50;
+  font-family: serif; /* セリフ体（明朝系）に変更 */
+  padding: 2em;
+}
+
+h1 {
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db; /* 青色の太い下線 */
+  padding-bottom: 0.5em;
+}
+
+h2 {
+  color: #3498db;
+  border-left: 5px solid #3498db; /* 左側に青いボーダー */
+  padding-left: 0.5em;
+  border-bottom: none;
+}
+
+/* コードブロックのカスタムスタイル */
+pre {
+  background-color: #f4f6f8;
+  border: 1px solid #e1e4e6;
+  border-radius: 6px;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+code {
+  font-family: Consolas, Monaco, "Courier New", monospace;
+  background-color: #f4f6f8;
+  color: #c7254e;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+pre code {
+  background-color: transparent;
+  color: #333333;
+  padding: 0;
+  border-radius: 0;
+  font-size: 0.9em;
+}
