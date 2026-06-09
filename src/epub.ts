@@ -32,10 +32,17 @@ export async function generateEPub(options: EPubOptions) {
   const markdownDir = path.dirname(options.markdownPath);
   const markdownContent = await fs.readFile(options.markdownPath, "utf-8");
 
+  // Remove YAML frontmatter if exists
+  let bodyContent = markdownContent;
+  const fmMatch = markdownContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  if (fmMatch) {
+    bodyContent = markdownContent.substring(fmMatch[0].length);
+  }
+
   // 1. タイトルの決定 (第一候補: 引数、第二候補: Markdown内の最初のh1、第三候補: ファイル名)
   let title = options.title;
   if (!title) {
-    const h1Match = markdownContent.match(/^#\s+(.+)$/m);
+    const h1Match = bodyContent.match(/^#\s+(.+)$/m);
     title = h1Match?.[1]?.trim() || path.basename(options.markdownPath, ".md");
   }
 
@@ -48,7 +55,7 @@ export async function generateEPub(options: EPubOptions) {
   // 4. UUIDの生成
   const uuid = `urn:uuid:${crypto.randomUUID()}`;
 
-  let htmlContent = await marked.parse(markdownContent, {
+  let htmlContent = await marked.parse(bodyContent, {
     async: true,
   });
 

@@ -42,6 +42,41 @@ You can run it directly using `bunx` without global installation:
 bunx mkepub <input-markdown> [options]
 ```
 
+
+### YAML Frontmatter Configuration
+
+You can configure EPUB generation settings directly inside the Markdown file using YAML frontmatter (a YAML block wrapped with `---` at the very beginning of the file).
+
+#### Configuration Options
+* `title`: Book title
+* `author`: Author name
+* `cover`: Path to the cover image file (relative to the Markdown file)
+* `toc`: Enable automatic generation of the Table of Contents (`true` / `false`)
+* `lang`: Language code for the EPUB (e.g., `ja`, `en`)
+* `css`: Path to a custom CSS stylesheet (relative to the Markdown file)
+* `output`: Path to the output EPUB file (relative to the Markdown file)
+
+#### Priority
+1. **CLI Option**: Highest priority (overrides YAML setting if explicitly specified)
+2. **YAML Frontmatter**: Medium priority (used if CLI option is omitted)
+3. **Default Value**: Lowest priority (used if neither is specified)
+
+#### Example
+```markdown
+---
+title: "My Awesome Book"
+author: "John Doe"
+cover: "./cover.png"
+toc: true
+lang: "en"
+css: "./custom.css"
+output: "./dist/mybook.epub"
+---
+
+# Introduction
+...
+```
+
 #### Options
 
 | Option | Short | Argument | Description | Default |
@@ -117,6 +152,41 @@ bunx mkepub <input-markdown> [options]
 | `--author` | なし | `<string>` | 著者名 | `Unknown` |
 | `--cover` | なし | `<path>` | カバー（表紙）画像のパス | なし |
 | `--lang` | なし | `<string>` | 書籍の言語コード | `ja` |
+
+
+### YAMLフロントマターによる設定
+
+Markdownファイルの先頭に `---` で囲まれたYAMLブロック（フロントマター）を記述することで、EPUB生成の設定を定義できます。
+
+#### 設定可能項目
+* `title`: 書籍のタイトル
+* `author`: 著者名
+* `cover`: カバー（表紙）画像のパス（Markdownファイルからの相対パス）
+* `toc`: 目次（Table of Contents）の自動生成（`true` / `false`）
+* `lang`: 書籍の言語コード（例: `ja`, `en`）
+* `css`: 適用するカスタムCSSファイルのパス（Markdownファイルからの相対パス）
+* `output`: 出力するEPUBファイルのパス（Markdownファイルからの相対パス）
+
+#### 設定の優先順位
+1. **CLI引数**: 最優先（明示的に引数で指定された場合、YAMLの設定を上書きします）
+2. **YAMLフロントマター**: CLI引数が省略された場合に適用されます
+3. **デフォルト値**: 上記のいずれにも指定がない場合に適用されます
+
+#### 記述例
+```markdown
+---
+title: "素晴らしい小説"
+author: "著者 太郎"
+cover: "./cover.png"
+toc: true
+lang: "ja"
+css: "./style.css"
+output: "./book.epub"
+---
+
+# はじめに
+...
+```
 
 #### 実行例
 
