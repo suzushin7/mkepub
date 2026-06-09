@@ -19,6 +19,7 @@ program
   .option("--author <string>", "Author name")
   .option("--cover <path>", "Path to the cover image file")
   .option("--lang <string>", "Language code for the EPUB")
+  .option("-d, --direction <string>", "Page progression direction (ltr or rtl)")
   .action(async (inputMarkdown, options) => {
     try {
       const markdownPath = path.resolve(inputMarkdown);
@@ -49,6 +50,7 @@ program
         author: options.author || frontmatter.author || "Unknown",
         lang: options.lang || frontmatter.lang || "ja",
         generateToc: options.toc !== undefined ? !!options.toc : (frontmatter.toc !== undefined ? !!frontmatter.toc : false),
+        direction: options.direction || frontmatter.direction || "ltr",
       };
 
       // Resolve CSS path
@@ -95,6 +97,7 @@ program
         author: mergedOptions.author,
         coverPath,
         lang: mergedOptions.lang,
+        direction: mergedOptions.direction,
       });
 
     } catch (error) {

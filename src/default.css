@@ -75,8 +75,9 @@ li {
 /* Blockquotes */
 blockquote {
   margin: 1em 0;
-  padding-left: 1.5em;
-  border-left: 4px solid #cccccc;
+  padding: 0.5em 1.5em;
+  border-top: 1px solid #999999;
+  border-bottom: 1px solid #999999;
   color: #666666;
   font-style: italic;
 }
@@ -143,4 +144,43 @@ img {
 /* Page break helper */
 .page-break {
   page-break-before: always;
+}
+
+/* Vertical writing mode (Japanese) */
+html.vertical {
+  writing-mode: vertical-rl;
+  -epub-writing-mode: vertical-rl;
+  -webkit-writing-mode: vertical-rl;
+  font-family: "Hiragino Mincho ProN", "YuMincho", "MS Mincho", "Georgia", serif;
+}
+
+html.vertical body {
+  padding: 1.5em 1em;
+}
+
+html.vertical h1 {
+  border-top: none;
+  border-bottom: none;
+  border-left: 1px solid #999999;
+  border-right: 1px solid #999999;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+
+html.vertical h2 {
+  border-bottom: none;
+  border-right: 1px dashed #999999;
+  padding-bottom: 0;
+  padding-right: 0.2em;
+}
+
+html.vertical blockquote {
+  border-top: none;
+  border-bottom: none;
+  border-left: 1px solid #999999;
+  border-right: 1px solid #999999;
+  padding: 1.5em 0.5em;
+  margin: 0 1em;
 }

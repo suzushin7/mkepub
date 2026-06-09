@@ -7,6 +7,7 @@ export interface EPubMetadata {
   uuid: string;
   coverPath?: string; // EPUB内での画像パス (例: images/cover.png)
   hasCover: boolean;
+  pageProgressionDirection: "ltr" | "rtl";
 }
 
 export interface ManifestItem {
@@ -71,7 +72,7 @@ export function getContentOpf(
   <manifest>
 ${manifestItemsXml}
   </manifest>
-  <spine toc="ncx">
+  <spine toc="ncx" page-progression-direction="${meta.pageProgressionDirection}">
 ${spineItemsXml}
   </spine>
 </package>`;
@@ -151,9 +152,10 @@ export function getNavXhtml(meta: EPubMetadata, tocItems: TocItem[]): string {
     listItemsXml = `<ol>\n      <li><a href="text/content.xhtml">${escapeXml(meta.title)}</a></li>\n    </ol>`;
   }
 
+    const htmlClass = meta.pageProgressionDirection === "rtl" ? ' class="vertical"' : '';
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${meta.lang}" xml:lang="${meta.lang}">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="${meta.lang}" xml:lang="${meta.lang}"${htmlClass}>
 <head>
   <title>${escapeXml(meta.title)}</title>
   <meta charset="utf-8" />
@@ -169,9 +171,10 @@ export function getNavXhtml(meta: EPubMetadata, tocItems: TocItem[]): string {
 }
 
 export function getHtmlWrap(meta: EPubMetadata, contentHtml: string): string {
+  const htmlClass = meta.pageProgressionDirection === "rtl" ? ' class="vertical"' : '';
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="${meta.lang}" xml:lang="${meta.lang}">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="${meta.lang}" xml:lang="${meta.lang}"${htmlClass}>
 <head>
   <title>${escapeXml(meta.title)}</title>
   <meta charset="utf-8" />

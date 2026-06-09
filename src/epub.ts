@@ -26,11 +26,13 @@ export interface EPubOptions {
   author?: string;
   coverPath?: string;
   lang?: string;
+  direction?: string;
 }
 
 export async function generateEPub(options: EPubOptions) {
   const markdownDir = path.dirname(options.markdownPath);
   const markdownContent = await fs.readFile(options.markdownPath, "utf-8");
+  const direction = options.direction === "rtl" ? "rtl" : "ltr";
 
   // Remove YAML frontmatter if exists
   let bodyContent = markdownContent;
@@ -112,7 +114,7 @@ export async function generateEPub(options: EPubOptions) {
     });
 
     // カバー用XHTMLの追加
-    const meta: EPubMetadata = { title, author, lang, uuid, hasCover: true };
+    const meta: EPubMetadata = { title, author, lang, uuid, hasCover: true, pageProgressionDirection: direction };
     const coverHtml = getCoverXhtml(meta, `../images/${coverFileName}`);
     zip.file("OEBPS/text/cover.xhtml", coverHtml);
     manifestItems.push({
@@ -225,6 +227,7 @@ export async function generateEPub(options: EPubOptions) {
     lang,
     uuid,
     hasCover: !!options.coverPath,
+    pageProgressionDirection: direction,
   };
 
   const xhtmlContent = getHtmlWrap(epubMeta, processedHtml);
