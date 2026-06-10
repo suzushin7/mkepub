@@ -11,6 +11,7 @@ import {
   getTocNcx,
   getHtmlWrap,
   getCoverXhtml,
+  getTitlePageXhtml,
   type EPubMetadata,
   type ManifestItem,
   type SpineItem,
@@ -70,6 +71,16 @@ export async function generateEPub(options: EPubOptions) {
     .replace(/<br([^>]*)(?<!\/)>/gi, "<br$1 />")
     .replace(/<hr([^>]*)(?<!\/)>/gi, "<hr$1 />");
 
+  // メインのXHTML用のメタデータ
+  const epubMeta: EPubMetadata = {
+    title,
+    author,
+    lang,
+    uuid,
+    hasCover: !!options.coverPath,
+    pageProgressionDirection: direction,
+  };
+
   // 6. 画像の抽出と置換、目次の抽出をパース後のHTMLから行う
   const manifestItems: ManifestItem[] = [];
   const spineItems: SpineItem[] = [];
@@ -117,8 +128,7 @@ export async function generateEPub(options: EPubOptions) {
     });
 
     // カバー用XHTMLの追加
-    const meta: EPubMetadata = { title, author, lang, uuid, hasCover: true, pageProgressionDirection: direction };
-    const coverHtml = getCoverXhtml(meta, `../images/${coverFileName}`);
+    const coverHtml = getCoverXhtml(epubMeta, `../images/${coverFileName}`);
     zip.file("OEBPS/text/cover.xhtml", coverHtml);
     manifestItems.push({
       id: "cover",
@@ -126,6 +136,16 @@ export async function generateEPub(options: EPubOptions) {
       mediaType: "application/xhtml+xml",
     });
     spineItems.push({ idref: "cover" });
+
+    // タイトルページ (title_page.xhtml) の追加
+    const titlePageHtml = getTitlePageXhtml(epubMeta);
+    zip.file("OEBPS/text/title_page.xhtml", titlePageHtml);
+    manifestItems.push({
+      id: "title_page",
+      href: "text/title_page.xhtml",
+      mediaType: "application/xhtml+xml",
+    });
+    spineItems.push({ idref: "title_page" });
   }
 
   // ナビゲーション (nav.xhtml) のアイテムを登録
@@ -180,15 +200,7 @@ export async function generateEPub(options: EPubOptions) {
     }
   }
 
-  // メインのXHTML用のメタデータ
-  const epubMeta: EPubMetadata = {
-    title,
-    author,
-    lang,
-    uuid,
-    hasCover: !!options.coverPath,
-    pageProgressionDirection: direction,
-  };
+
 
   // <h1>の直前および page-break タグの位置に分割用マーカーを挿入
   let splitPreparedHtml = processedHtml.replace(/(<h1[^>]*>)/gi, "<!-- PAGE_BREAK_MARKER -->$1");
