@@ -8,6 +8,8 @@ export interface EPubMetadata {
   coverPath?: string; // EPUB内での画像パス (例: images/cover.png)
   hasCover: boolean;
   pageProgressionDirection: "ltr" | "rtl";
+  published?: string;
+  modified?: string;
 }
 
 export interface ManifestItem {
@@ -60,20 +62,42 @@ export function getContentOpf(
     coverMeta = `\n    <meta name="cover" content="cover-image"/>`;
   }
 
+  // 出版日の埋め込み (EPUB 3 dc:date)
+  let dateMeta = "";
+  if (meta.published) {
+    dateMeta = `\n    <dc:date>${escapeXml(meta.published)}</dc:date>`;
+  }
+
+  // 最終更新日 (dcterms:modified)。指定された modified があれば優先、なければ現在時刻
+  let modifiedDateStr = "";
+  if (meta.modified) {
+    try {
+      const parsed = new Date(meta.modified);
+      if (!isNaN(parsed.getTime())) {
+        modifiedDateStr = parsed.toISOString().replace(/\.\d+Z$/, "Z");
+      }
+    } catch {
+      // ignore
+    }
+  }
+  if (!modifiedDateStr) {
+    modifiedDateStr = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+  }
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="pub-id" version="3.0">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
     <dc:identifier id="pub-id">${meta.uuid}</dc:identifier>
     <dc:title>${escapeXml(meta.title)}</dc:title>
     <dc:creator id="creator">${escapeXml(meta.author)}</dc:creator>
-    <dc:language>${meta.lang}</dc:language>
-    <meta property="dcterms:modified">${new Date().toISOString().replace(/\.\d+Z$/, "Z")}</meta>${coverMeta}
+    <dc:language>${meta.lang}</dc:language>${dateMeta}
+    <meta property="dcterms:modified">${modifiedDateStr}</meta>${coverMeta}
   </metadata>
   <manifest>
-${manifestItemsXml}
+    ${manifestItemsXml}
   </manifest>
   <spine toc="ncx" page-progression-direction="${meta.pageProgressionDirection}">
-${spineItemsXml}
+    ${spineItemsXml}
   </spine>
 </package>`;
 }
@@ -213,6 +237,22 @@ export function getTitlePageXhtml(meta: EPubMetadata): string {
   const writingMode = isVertical ? 'writing-mode: vertical-rl; -epub-writing-mode: vertical-rl; -webkit-writing-mode: vertical-rl;' : '';
   const fontStyle = isVertical ? 'font-family: "Hiragino Mincho ProN", "YuMincho", "MS Mincho", "Georgia", serif;' : '';
 
+  const isJa = meta.lang.startsWith("ja");
+  const pubLabel = isJa ? "出版日" : "Published";
+  const modLabel = isJa ? "更新日" : "Modified";
+
+  let datesHtml = "";
+  if (meta.published || meta.modified) {
+    datesHtml = `\n    <div class="dates">`;
+    if (meta.published) {
+      datesHtml += `\n      <div class="published-date">${pubLabel}: ${escapeXml(meta.published)}</div>`;
+    }
+    if (meta.modified) {
+      datesHtml += `\n      <div class="modified-date">${modLabel}: ${escapeXml(meta.modified)}</div>`;
+    }
+    datesHtml += `\n    </div>`;
+  }
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="${meta.lang}" xml:lang="${meta.lang}"${htmlClass}>
@@ -241,10 +281,23 @@ export function getTitlePageXhtml(meta: EPubMetadata): string {
       font-size: 1.5em;
       text-align: center;
     }
+    .dates {
+      margin-top: 5em;
+      font-size: 0.9em;
+      color: #666666;
+      text-align: center;
+      line-height: 1.8;
+    }
+    .published-date, .modified-date {
+      margin: 0.5em 0;
+    }
     @media (prefers-color-scheme: dark) {
       body {
         background-color: #121212;
         color: #e0e0e0;
+      }
+      .dates {
+        color: #aaaaaa;
       }
     }
   </style>
@@ -252,7 +305,7 @@ export function getTitlePageXhtml(meta: EPubMetadata): string {
 <body>
   <div>
     <div class="title">${escapeXml(meta.title)}</div>
-    <div class="author">${escapeXml(meta.author)}</div>
+    <div class="author">${escapeXml(meta.author)}</div>${datesHtml}
   </div>
 </body>
 </html>`;

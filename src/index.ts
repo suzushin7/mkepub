@@ -20,6 +20,8 @@ program
   .option("--cover <path>", "Path to the cover image file")
   .option("--lang <string>", "Language code for the EPUB")
   .option("-d, --direction <string>", "Page progression direction (ltr or rtl)")
+  .option("--published <string>", "Publication date (e.g., 2026-06-11)")
+  .option("--modified <string>", "Modification date (e.g., 2026-06-11)")
   .action(async (inputMarkdowns: string[], options) => {
     try {
       const markdownPaths = inputMarkdowns.map((p: string) => path.resolve(p));
@@ -78,6 +80,8 @@ program
         lang: options.lang || frontmatter.lang || "ja",
         generateToc: options.toc !== undefined ? !!options.toc : (frontmatter.toc !== undefined ? !!frontmatter.toc : false),
         direction: options.direction || frontmatter.direction || "ltr",
+        published: options.published || frontmatter.published,
+        modified: options.modified || frontmatter.modified,
       };
 
       // Resolve CSS path
@@ -126,6 +130,8 @@ program
         lang: mergedOptions.lang,
         direction: mergedOptions.direction,
         markdownContent: mergedBodyContent,
+        published: mergedOptions.published,
+        modified: mergedOptions.modified,
       });
 
     } catch (error) {

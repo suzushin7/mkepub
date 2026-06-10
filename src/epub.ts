@@ -29,6 +29,8 @@ export interface EPubOptions {
   lang?: string;
   direction?: string;
   markdownContent?: string;
+  published?: string;
+  modified?: string;
 }
 
 export async function generateEPub(options: EPubOptions) {
@@ -79,6 +81,8 @@ export async function generateEPub(options: EPubOptions) {
     uuid,
     hasCover: !!options.coverPath,
     pageProgressionDirection: direction,
+    published: options.published,
+    modified: options.modified,
   };
 
   // 6. 画像の抽出と置換、目次の抽出をパース後のHTMLから行う

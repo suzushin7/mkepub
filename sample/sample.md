@@ -6,6 +6,8 @@ toc: true
 lang: ja
 css: "./custom.css"
 output: "./sample.epub"
+published: "2026-06-11"
+modified: "2026-06-11"
 ---
 # サンプル書籍 (標準版)
 
