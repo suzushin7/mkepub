@@ -286,7 +286,9 @@ export async function generateEPub(options: EPubOptions) {
 
   // 目次 (nav.xhtml, toc.ncx) の生成
   const tocToUse = options.generateToc ? tocItems : [];
-  zip.file("OEBPS/nav.xhtml", getNavXhtml(epubMeta, tocToUse));
+  const isSingleFile = htmlSections.length === 1;
+  const firstContentHref = isSingleFile ? "text/content.xhtml" : "text/content_1.xhtml";
+  zip.file("OEBPS/nav.xhtml", getNavXhtml(epubMeta, tocToUse, firstContentHref));
   zip.file("OEBPS/toc.ncx", getTocNcx(epubMeta, tocToUse));
 
   manifestItems.push({

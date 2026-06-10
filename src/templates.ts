@@ -135,7 +135,7 @@ ${navPointsXml}
 </ncx>`;
 }
 
-export function getNavXhtml(meta: EPubMetadata, tocItems: TocItem[]): string {
+export function getNavXhtml(meta: EPubMetadata, tocItems: TocItem[], firstContentHref: string): string {
   let listItemsXml = "";
   if (tocItems.length > 0) {
     let listContent = "";
@@ -173,7 +173,7 @@ export function getNavXhtml(meta: EPubMetadata, tocItems: TocItem[]): string {
 
     listItemsXml = `<ol>\n      ${listContent}\n    </ol>`;
   } else {
-    listItemsXml = `<ol>\n      <li><a href="text/content.xhtml">${escapeXml(meta.title)}</a></li>\n    </ol>`;
+    listItemsXml = `<ol>\n      <li><a href="${firstContentHref}">${escapeXml(meta.title)}</a></li>\n    </ol>`;
   }
 
     const htmlClass = meta.pageProgressionDirection === "rtl" ? ' class="vertical"' : '';
