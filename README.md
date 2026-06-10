@@ -15,6 +15,8 @@ A fast, simple CLI tool to automatically generate EPUB files from Markdown docum
 - 📖 **Automatic TOC**: Generate logical tables of contents (EPUB 3 nav and NCX) with `--toc`.
 - 🖼️ **Image Auto-Embedding**: Detects relative local image paths in your Markdown and bundles them into the EPUB automatically.
 - 🏷️ **Metadata Customization**: Easily set the Title, Author, Language, and Cover image via command options.
+- 📄 **Separated Cover & Title Page**: When a cover image is configured, `mkepub` generates a dedicated cover-only page, followed by a separate title and author page, matching the layout of professional e-books.
+- ✂️ **Automatic H1 Page Breaks (XHTML Splitting)**: To ensure clean formatting, the content is physically split into separate XHTML files right before every `<h1>` (`# ` header) tag. This guarantees reliable page breaks across all EPUB readers.
 - ✍️ **Vertical & Horizontal Layout**: Supports both horizontal (`ltr`) and vertical (`rtl`) layouts. When `rtl` is specified, the layout automatically switches to vertical writing mode with Mincho fonts, optimized margins, and borders (e.g., blockquote and header borders are adjusted).
 
 ### Installation
@@ -48,7 +50,7 @@ bunx mkepub <input-markdowns...> [options]
 
 You can configure EPUB generation settings directly inside the Markdown file using YAML frontmatter (a YAML block wrapped with `---` at the very beginning of the file).
 
-*Note: If multiple input files are specified, the YAML frontmatter of the **first file** is used as the primary configuration. Subsequent files' frontmatters are stripped, and their contents are concatenated automatically with page-breaks.*
+*Note: If multiple input files are specified, the YAML frontmatter of the **first file** is used as the primary configuration. Subsequent files' frontmatters are stripped, and their contents are concatenated automatically with reliable page-breaks (each file and each `<h1>` heading starts on a new page).*
 
 #### Configuration Options
 * `title`: Book title
@@ -125,6 +127,8 @@ bunx mkepub draft.md -o book.epub --css style.css --toc --title "My Masterpiece"
 - 📖 **目次自動生成**: `--toc` オプションを指定することで、Markdownの見出し（h1〜h3）を解析し、EPUB 3標準のナビゲーション目次（`nav.xhtml`）および `toc.ncx` を自動生成します。
 - 🖼️ **画像の自動インポート**: Markdown内に記述された相対パスのローカル画像を検出し、自動でEPUBパッケージにコピーしてパスを補正します。
 - 🏷️ **メタデータ設定**: 書籍のタイトル、著者名、言語設定、カバー（表紙）画像をコマンドライン引数から簡単に指定できます。
+- 📄 **カバー画像とタイトル扉の分離**: カバー画像を設定した場合、カバー画像のみを表示する専用ページが生成され、その後に改ページされてタイトルと著者名を表示する扉ページが独立して出力されます。
+- ✂️ **H1（大見出し）直前での自動物理分割**: Markdown内のすべての `<h1>`（`# ` 見出し）の直前でXHTMLファイルを自動分割します。これにより、ほぼすべてのEPUBリーダーで確実に見出しの直前での改ページが行われます。
 - ✍️ **縦書き・横書き両対応**: 横書き（`ltr`）だけでなく、日本語書籍で一般的な縦書き（`rtl`）表示に対応しています。縦書き指定時は、文字送り方向だけでなく、明朝体フォントへの自動切り替えや見出し・引用文（blockquote）の余白・枠線も自動的に最適化されます。
 
 ### インストール方法
@@ -171,7 +175,7 @@ bunx mkepub <input-markdowns...> [options]
 
 Markdownファイルの先頭に `---` で囲まれたYAMLブロック（フロントマター）を記述することで、EPUB生成の設定を定義できます。
 
-※複数のマークダウンファイルを指定した場合、**最初のファイル**のYAMLフロントマターが書籍の設定として使用されます。2つ目以降のファイルのフロントマターは自動で除去され、本文同士が改ページ（ファイル分割）を挟んで連結されます。
+※複数のマークダウンファイルを指定した場合、**最初のファイル**のYAMLフロントマターが書籍の設定として使用されます。2つ目以降のファイルのフロントマターは自動で除去され、本文同士が確実な改ページ（ファイル境界および各ファイル内の `<h1>` での物理分割）を挟んで連結されます。
 
 #### 設定可能項目
 * `title`: 書籍のタイトル
