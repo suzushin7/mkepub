@@ -144,6 +144,11 @@ img {
 /* Page break helper */
 .page-break {
   page-break-before: always;
+  break-before: page;
+  display: block;
+  height: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* Vertical writing mode (Japanese) */
@@ -183,4 +188,62 @@ html.vertical blockquote {
   border-right: 1px solid #999999;
   padding: 1.5em 0.5em;
   margin: 0 1em;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  html {
+    color: #e0e0e0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+  }
+
+  h1 {
+    border-color: #555555;
+  }
+
+  h2 {
+    border-color: #555555;
+  }
+
+  a {
+    color: #66b2ff;
+  }
+
+  blockquote {
+    border-color: #555555;
+    color: #aaaaaa;
+  }
+
+  pre {
+    background-color: #1e1e1e;
+    border-color: #333333;
+  }
+
+  code {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+  }
+
+  .toc-item {
+    border-color: #444444;
+  }
+
+  .toc-link {
+    color: #e0e0e0;
+  }
+
+  html.vertical h1 {
+    border-color: #555555;
+  }
+
+  html.vertical h2 {
+    border-color: #555555;
+  }
+
+  html.vertical blockquote {
+    border-color: #555555;
+  }
 }

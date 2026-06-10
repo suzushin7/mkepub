@@ -177,50 +177,7 @@ export async function generateEPub(options: EPubOptions) {
     }
   }
 
-  // 目次の抽出（h1, h2, h3）
-  // 簡易的にHTMLタグから見出しを抽出する
-  const headingRegex = /<(h[1-3])\s*(?:id="([^"]+)")?\s*>(.*?)<\/h[1-3]>/gi;
-  let headingMatch;
-  let headingIndex = 1;
-  const headingsToInsertIds: { original: string; replaced: string }[] = [];
-
-  while ((headingMatch = headingRegex.exec(processedHtml)) !== null) {
-    const tag = headingMatch[1];
-    const originalId = headingMatch[2];
-    const textGroup = headingMatch[3];
-
-    if (!tag || !textGroup) {
-      continue;
-    }
-
-    const text = textGroup.replace(/<[^>]+>/g, ""); // 内部HTMLタグを除去してプレーンテキストにする
-    const level = parseInt(tag.substring(1));
-
-    const id = originalId || `heading-${headingIndex}`;
-    
-    if (!originalId) {
-      // idがなかった場合は後で置換するために記録
-      headingsToInsertIds.push({
-        original: headingMatch[0],
-        replaced: `<${tag} id="${id}">${textGroup}</${tag}>`,
-      });
-    }
-
-    tocItems.push({
-      title: text,
-      href: `text/content.xhtml#${id}`,
-      level,
-    });
-
-    headingIndex++;
-  }
-
-  // 見出しにIDを付与したHTMLにする
-  for (const item of headingsToInsertIds) {
-    processedHtml = processedHtml.replace(item.original, item.replaced);
-  }
-
-  // メインのXHTMLの書き込み
+  // メインのXHTML用のメタデータ
   const epubMeta: EPubMetadata = {
     title,
     author,
@@ -230,17 +187,76 @@ export async function generateEPub(options: EPubOptions) {
     pageProgressionDirection: direction,
   };
 
-  const xhtmlContent = getHtmlWrap(epubMeta, processedHtml);
-  zip.file("OEBPS/text/content.xhtml", xhtmlContent);
-  manifestItems.push({
-    id: "content",
-    href: "text/content.xhtml",
-    mediaType: "application/xhtml+xml",
-  });
+  // HTMLコンテンツを div.page-break または span.page-break で分割
+  const htmlSections = processedHtml.split(/<(?:div|span)\s+class="page-break"\s*(?:><\/(?:div|span)>|\/>)/gi);
+
+  for (let i = 0; i < htmlSections.length; i++) {
+    let sectionHtml = htmlSections[i] || "";
+    const isSingleFile = htmlSections.length === 1;
+    const fileId = isSingleFile ? "content" : `content_${i + 1}`;
+    const fileHref = `text/${fileId}.xhtml`;
+
+    // セクションごとの目次の抽出（h1, h2, h3）
+    const headingRegex = /<(h[1-3])\s*(?:id="([^"]+)")?\s*>(.*?)<\/h[1-3]>/gi;
+    let headingMatch;
+    let headingIndex = 1;
+    const headingsToInsertIds: { original: string; replaced: string }[] = [];
+
+    while ((headingMatch = headingRegex.exec(sectionHtml)) !== null) {
+      const tag = headingMatch[1] || "";
+      const originalId = headingMatch[2];
+      const textGroup = headingMatch[3] || "";
+
+      if (!tag || !textGroup) {
+        continue;
+      }
+
+      const text = textGroup.replace(/<[^>]+>/g, ""); // 内部HTMLタグを除去してプレーンテキストにする
+      const level = parseInt(tag.substring(1));
+      const id = originalId || `heading-${i + 1}-${headingIndex}`;
+      
+      if (!originalId) {
+        // idがなかった場合は後で置換するために記録
+        headingsToInsertIds.push({
+          original: headingMatch[0],
+          replaced: `<${tag} id="${id}">${textGroup}</${tag}>`,
+        });
+      }
+
+      tocItems.push({
+        title: text,
+        href: `${fileHref}#${id}`,
+        level,
+      });
+
+      headingIndex++;
+    }
+
+    // 見出しにIDを付与したHTMLにする
+    for (const item of headingsToInsertIds) {
+      sectionHtml = sectionHtml.replace(item.original, item.replaced);
+    }
+
+    // XHTMLの書き込み
+    const xhtmlContent = getHtmlWrap(epubMeta, sectionHtml);
+    zip.file(`OEBPS/${fileHref}`, xhtmlContent);
+
+    manifestItems.push({
+      id: fileId,
+      href: fileHref,
+      mediaType: "application/xhtml+xml",
+    });
+  }
+
   if (options.generateToc) {
     spineItems.push({ idref: "nav" });
   }
-  spineItems.push({ idref: "content" });
+
+  for (let i = 0; i < htmlSections.length; i++) {
+    const isSingleFile = htmlSections.length === 1;
+    const fileId = isSingleFile ? "content" : `content_${i + 1}`;
+    spineItems.push({ idref: fileId });
+  }
 
   // 目次 (nav.xhtml, toc.ncx) の生成
   const tocToUse = options.generateToc ? tocItems : [];

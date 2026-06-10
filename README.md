@@ -102,7 +102,7 @@ bunx mkepub draft.md
 
 **Full features:**
 ```bash
-bunx mkepub draft.md -o book.epub --css style.css --toc --title "My Masterpiece" --author "Author Name" --cover cover.png
+bunx mkepub draft.md -o book.epub --css style.css --toc --title "My Masterpiece" --author "Author Name" --cover cover.png --direction rtl
 ```
 
 ---
@@ -205,7 +205,7 @@ bunx mkepub draft.md
 
 **全オプションを指定した変換:**
 ```bash
-bunx mkepub draft.md -o book.epub --css style.css --toc --title "素晴らしい小説" --author "著者 太郎" --cover cover.png
+bunx mkepub draft.md -o book.epub --css style.css --toc --title "素晴らしい小説" --author "著者 太郎" --cover cover.png --direction rtl
 ```
 
 ---

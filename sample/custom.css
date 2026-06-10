@@ -1,7 +1,6 @@
 @charset "utf-8";
 
 body {
-  background-color: #fafafa;
   color: #2c3e50;
   font-family: serif; /* セリフ体（明朝系）に変更 */
   padding: 2em;
