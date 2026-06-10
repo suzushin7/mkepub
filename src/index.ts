@@ -11,8 +11,8 @@ program
   .name("mkepub")
   .description("A CLI tool to automatically generate EPUB files from Markdown documents")
   .version("1.0.0")
-  .argument("<input-markdown>", "Path to the input Markdown file")
-  .option("-o, --output <path>", "Path to the output EPUB file (default: <input-name>.epub)")
+  .argument("<input-markdowns...>", "Paths to the input Markdown files")
+  .option("-o, --output <path>", "Path to the output EPUB file (default: <first-input-name>.epub)")
   .option("-c, --css <path>", "Path to a custom CSS stylesheet")
   .option("-t, --toc", "Enable automatic generation of the Table of Contents")
   .option("--title <string>", "Book title (default: first <h1> or filename)")
@@ -20,27 +20,54 @@ program
   .option("--cover <path>", "Path to the cover image file")
   .option("--lang <string>", "Language code for the EPUB")
   .option("-d, --direction <string>", "Page progression direction (ltr or rtl)")
-  .action(async (inputMarkdown, options) => {
+  .action(async (inputMarkdowns: string[], options) => {
     try {
-      const markdownPath = path.resolve(inputMarkdown);
+      const markdownPaths = inputMarkdowns.map((p: string) => path.resolve(p));
       
-      // Check input file existence
-      try {
-        await fs.access(markdownPath);
-      } catch {
-        console.error(`Error: Input file not found: ${inputMarkdown}`);
+      // Check input files existence
+      for (const p of markdownPaths) {
+        try {
+          await fs.access(p);
+        } catch {
+          console.error(`Error: Input file not found: ${p}`);
+          process.exit(1);
+        }
+      }
+
+      // Base markdown path for resolving relative paths (using the first file)
+      const markdownPath = markdownPaths[0];
+      if (!markdownPath) {
+        console.error("Error: No input files specified.");
         process.exit(1);
       }
 
-      // Read file and parse YAML frontmatter if exists
-      const markdownContent = await fs.readFile(markdownPath, "utf-8");
       let frontmatter: any = {};
-      const fmMatch = markdownContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
-      if (fmMatch && fmMatch[1]) {
-        try {
-          frontmatter = parseYaml(fmMatch[1]) || {};
-        } catch (error) {
-          console.warn("Warning: Failed to parse YAML frontmatter.", error);
+      let mergedBodyContent = "";
+
+      for (let i = 0; i < markdownPaths.length; i++) {
+        const p = markdownPaths[i] || "";
+        const markdownContent = await fs.readFile(p, "utf-8");
+        
+        let fileFrontmatter: any = {};
+        let body = markdownContent;
+        const fmMatch = markdownContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+        
+        if (fmMatch && fmMatch[1]) {
+          try {
+            fileFrontmatter = parseYaml(fmMatch[1]) || {};
+            body = markdownContent.substring(fmMatch[0].length);
+          } catch (error) {
+            console.warn(`Warning: Failed to parse YAML frontmatter in ${p}.`, error);
+          }
+        }
+
+        // Use the frontmatter of the first file as the primary configuration
+        if (i === 0) {
+          frontmatter = fileFrontmatter;
+          mergedBodyContent = body;
+        } else {
+          // Append subsequent files with a page break delimiter
+          mergedBodyContent += "\n\n<div class=\"page-break\"></div>\n\n" + body;
         }
       }
 
@@ -85,7 +112,7 @@ program
       outputPath = path.resolve(outputPath);
 
       console.log("Starting EPUB generation...");
-      console.log(`Input: ${markdownPath}`);
+      console.log(`Input(s): ${markdownPaths.join(", ")}`);
       console.log(`Output: ${outputPath}`);
 
       await generateEPub({
@@ -98,6 +125,7 @@ program
         coverPath,
         lang: mergedOptions.lang,
         direction: mergedOptions.direction,
+        markdownContent: mergedBodyContent,
       });
 
     } catch (error) {

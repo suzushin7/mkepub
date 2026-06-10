@@ -40,13 +40,15 @@ bun link
 You can run it directly using `bunx` without global installation:
 
 ```bash
-bunx mkepub <input-markdown> [options]
+bunx mkepub <input-markdowns...> [options]
 ```
 
 
 ### YAML Frontmatter Configuration
 
 You can configure EPUB generation settings directly inside the Markdown file using YAML frontmatter (a YAML block wrapped with `---` at the very beginning of the file).
+
+*Note: If multiple input files are specified, the YAML frontmatter of the **first file** is used as the primary configuration. Subsequent files' frontmatters are stripped, and their contents are concatenated automatically with page-breaks.*
 
 #### Configuration Options
 * `title`: Book title
@@ -100,6 +102,11 @@ direction: "ltr"
 bunx mkepub draft.md
 ```
 
+**Merging multiple files:**
+```bash
+bunx mkepub chapter1.md chapter2.md chapter3.md -o finished_book.epub
+```
+
 **Full features:**
 ```bash
 bunx mkepub draft.md -o book.epub --css style.css --toc --title "My Masterpiece" --author "Author Name" --cover cover.png --direction rtl
@@ -143,7 +150,7 @@ bun link
 グローバルインストールをせず、`bunx` を使って直接実行することも可能です。
 
 ```bash
-bunx mkepub <input-markdown> [options]
+bunx mkepub <input-markdowns...> [options]
 ```
 
 #### オプション一覧
@@ -163,6 +170,8 @@ bunx mkepub <input-markdown> [options]
 ### YAMLフロントマターによる設定
 
 Markdownファイルの先頭に `---` で囲まれたYAMLブロック（フロントマター）を記述することで、EPUB生成の設定を定義できます。
+
+※複数のマークダウンファイルを指定した場合、**最初のファイル**のYAMLフロントマターが書籍の設定として使用されます。2つ目以降のファイルのフロントマターは自動で除去され、本文同士が改ページ（ファイル分割）を挟んで連結されます。
 
 #### 設定可能項目
 * `title`: 書籍のタイトル
@@ -201,6 +210,11 @@ direction: "ltr"
 **最もシンプルな変換:**
 ```bash
 bunx mkepub draft.md
+```
+
+**複数ファイルの連結:**
+```bash
+bunx mkepub chapter1.md chapter2.md chapter3.md -o finished_book.epub
 ```
 
 **全オプションを指定した変換:**

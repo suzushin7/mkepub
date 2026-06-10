@@ -27,11 +27,14 @@ export interface EPubOptions {
   coverPath?: string;
   lang?: string;
   direction?: string;
+  markdownContent?: string;
 }
 
 export async function generateEPub(options: EPubOptions) {
   const markdownDir = path.dirname(options.markdownPath);
-  const markdownContent = await fs.readFile(options.markdownPath, "utf-8");
+  const markdownContent = options.markdownContent !== undefined
+    ? options.markdownContent
+    : await fs.readFile(options.markdownPath, "utf-8");
   const direction = options.direction === "rtl" ? "rtl" : "ltr";
 
   // Remove YAML frontmatter if exists
