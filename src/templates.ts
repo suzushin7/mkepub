@@ -187,21 +187,66 @@ ${contentHtml}
 }
 
 export function getCoverXhtml(meta: EPubMetadata, coverImageHref: string): string {
+  const isVertical = meta.pageProgressionDirection === "rtl";
+  const htmlClass = isVertical ? ' class="vertical"' : '';
+  const writingMode = isVertical ? 'writing-mode: vertical-rl; -epub-writing-mode: vertical-rl; -webkit-writing-mode: vertical-rl;' : '';
+  const fontStyle = isVertical ? 'font-family: "Hiragino Mincho ProN", "YuMincho", "MS Mincho", "Georgia", serif;' : '';
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="${meta.lang}" xml:lang="${meta.lang}">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="${meta.lang}" xml:lang="${meta.lang}"${htmlClass}>
 <head>
   <title>Cover</title>
   <meta charset="utf-8" />
   <style type="text/css">
     @page { padding: 0; margin: 0; }
-    body { margin: 0; padding: 0; text-align: center; background-color: #ffffff; }
-    img { max-width: 100%; max-height: 100%; height: auto; width: auto; margin: auto; display: block; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
+    body { 
+      margin: 0; 
+      padding: 1.5em; 
+      text-align: center; 
+      background-color: #ffffff; 
+      color: #333333;
+      ${writingMode}
+      ${fontStyle}
+    }
+    .cover-title {
+      font-size: 2.2em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      text-align: center;
+    }
+    .cover-author {
+      font-size: 1.2em;
+      margin-bottom: 2em;
+      text-align: center;
+    }
+    .cover-image-wrapper {
+      text-align: center;
+      margin: 0 auto;
+    }
+    img { 
+      max-width: 85%; 
+      max-height: 60vh; 
+      height: auto; 
+      width: auto; 
+      margin: 0 auto; 
+      display: block; 
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #121212;
+        color: #e0e0e0;
+      }
+    }
   </style>
 </head>
 <body>
   <div>
-    <img src="${coverImageHref}" alt="Cover Image" />
+    <div class="cover-title">${escapeXml(meta.title)}</div>
+    <div class="cover-author">${escapeXml(meta.author)}</div>
+    <div class="cover-image-wrapper">
+      <img src="${coverImageHref}" alt="Cover Image" />
+    </div>
   </div>
 </body>
 </html>`;
