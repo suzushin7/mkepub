@@ -42,7 +42,7 @@ bun link
 You can run it directly using `bunx` without global installation:
 
 ```bash
-bunx mkepub <input-markdowns...> [options]
+bunx github:suzushin7/mkepub <input-markdowns...> [options]
 ```
 
 
@@ -154,7 +154,7 @@ bun link
 グローバルインストールをせず、`bunx` を使って直接実行することも可能です。
 
 ```bash
-bunx mkepub <input-markdowns...> [options]
+bunx github:suzushin7/mkepub <input-markdowns...> [options]
 ```
 
 #### オプション一覧
