@@ -190,8 +190,15 @@ export async function generateEPub(options: EPubOptions) {
     pageProgressionDirection: direction,
   };
 
-  // HTMLコンテンツを div.page-break または span.page-break で分割
-  const htmlSections = processedHtml.split(/<(?:div|span)\s+class="page-break"\s*(?:><\/(?:div|span)>|\/>)/gi);
+  // <h1>の直前および page-break タグの位置に分割用マーカーを挿入
+  let splitPreparedHtml = processedHtml.replace(/(<h1[^>]*>)/gi, "<!-- PAGE_BREAK_MARKER -->$1");
+  splitPreparedHtml = splitPreparedHtml.replace(/<(?:div|span)\s+class="page-break"\s*(?:><\/(?:div|span)>|\/>)/gi, "<!-- PAGE_BREAK_MARKER -->");
+
+  // マーカーで分割し、空のセクションを排除
+  const htmlSections = splitPreparedHtml
+    .split("<!-- PAGE_BREAK_MARKER -->")
+    .map((section) => section.trim())
+    .filter((section) => section.length > 0);
 
   for (let i = 0; i < htmlSections.length; i++) {
     let sectionHtml = htmlSections[i] || "";
