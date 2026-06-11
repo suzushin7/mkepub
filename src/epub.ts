@@ -140,17 +140,17 @@ export async function generateEPub(options: EPubOptions) {
       mediaType: "application/xhtml+xml",
     });
     spineItems.push({ idref: "cover" });
-
-    // タイトルページ (title_page.xhtml) の追加
-    const titlePageHtml = getTitlePageXhtml(epubMeta);
-    zip.file("OEBPS/text/title_page.xhtml", titlePageHtml);
-    manifestItems.push({
-      id: "title_page",
-      href: "text/title_page.xhtml",
-      mediaType: "application/xhtml+xml",
-    });
-    spineItems.push({ idref: "title_page" });
   }
+
+  // タイトルページ (title_page.xhtml) の追加 (常に生成)
+  const titlePageHtml = getTitlePageXhtml(epubMeta);
+  zip.file("OEBPS/text/title_page.xhtml", titlePageHtml);
+  manifestItems.push({
+    id: "title_page",
+    href: "text/title_page.xhtml",
+    mediaType: "application/xhtml+xml",
+  });
+  spineItems.push({ idref: "title_page" });
 
   // ナビゲーション (nav.xhtml) のアイテムを登録
   manifestItems.push({
