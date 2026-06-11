@@ -271,7 +271,7 @@ export function getTitlePageXhtml(meta: EPubMetadata): string {
       ${fontStyle}
     }
     .title {
-      font-size: 2.5em;
+      font-size: 2.0em;
       font-weight: bold;
       margin-top: 15vh;
       margin-bottom: 2em;
