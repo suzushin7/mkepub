@@ -13,10 +13,11 @@ A fast, simple CLI tool to automatically generate EPUB files from Markdown docum
 - ⚡ **Super Fast**: Powered by Bun and JSZip for blazing-fast generation.
 - 🎨 **Styling Support**: Automatically applies a clean default stylesheet, or customize it with `--css`.
 - 📖 **Automatic TOC**: Generate logical tables of contents (EPUB 3 nav and NCX) with `--toc`.
-- 🖼️ **Image Auto-Embedding**: Detects relative local image paths in your Markdown and bundles them into the EPUB automatically.
+- 🖼️ **Image Auto-Embedding & Conversion**: Detects relative local image paths in your Markdown and bundles them. **PNG images are automatically converted to compressed JPG format (90% quality) to optimize the EPUB file size.**
 - 🏷️ **Metadata Customization**: Easily set the Title, Author, Language, and Cover image via command options.
-- 📄 **Separated Cover & Title Page**: When a cover image is configured, `mkepub` generates a dedicated cover-only page, followed by a separate title and author page, matching the layout of professional e-books.
+- 📄 **Always-Generated Title Page**: A dedicated title page displaying the Title, Author, and dates is always generated as the book's first page (right after the cover page, if a cover image is provided).
 - ✂️ **Automatic H1 Page Breaks (XHTML Splitting)**: To ensure clean formatting, the content is physically split into separate XHTML files right before every `<h1>` (`# ` header) tag. This guarantees reliable page breaks across all EPUB readers.
+- 📊 **Enhanced Table Support**: Provides clean, modern table styling with visible borders, padding, margin-bottom, and high-contrast zebra striping. **In vertical writing mode (`rtl`), tables are automatically rendered horizontally (`writing-mode: horizontal-tb`) to prevent layout corruption.**
 - ✍️ **Vertical & Horizontal Layout**: Supports both horizontal (`ltr`) and vertical (`rtl`) layouts. When `rtl` is specified, the layout automatically switches to vertical writing mode with Mincho fonts, optimized margins, and borders (e.g., blockquote and header borders are adjusted).
 
 ### Installation
@@ -129,10 +130,11 @@ bunx mkepub draft.md -o book.epub --css style.css --toc --title "My Masterpiece"
 - ⚡ **超高速**: Bun と JSZip の採用により、一瞬でEPUBパッケージを作成します。
 - 🎨 **美しいデフォルトスタイル**: 読みやすさに配慮したデフォルトCSSを内蔵。`--css` を使用して独自のカスタムCSSを設定することも可能です。
 - 📖 **目次自動生成**: `--toc` オプションを指定することで、Markdownの見出し（h1〜h3）を解析し、EPUB 3標準のナビゲーション目次（`nav.xhtml`）および `toc.ncx` を自動生成します。
-- 🖼️ **画像の自動インポート**: Markdown内に記述された相対パスのローカル画像を検出し、自動でEPUBパッケージにコピーしてパスを補正します。
+- 🖼️ **画像の自動インポートと軽量化**: Markdown内に記述された相対パスのローカル画像を検出し、自動でEPUBパッケージにコピーしてパスを補正します。**PNG画像が検出された場合、EPUB全体のデータ容量を削減するために、自動的にJPG形式（品質90%）へ変換・圧縮して埋め込みます。**
 - 🏷️ **メタデータ設定**: 書籍のタイトル、著者名、言語設定、カバー（表紙）画像をコマンドライン引数から簡単に指定できます。
-- 📄 **カバー画像とタイトル扉の分離**: カバー画像を設定した場合、カバー画像のみを表示する専用ページが生成され、その後に改ページされてタイトルと著者名を表示する扉ページが独立して出力されます。
+- 📄 **タイトル扉ページの常時生成**: 書籍のタイトル、著者名、日付（出版日・更新日）を表示するタイトル扉ページ（`title_page.xhtml`）が、カバー画像の有無にかかわらず常に本の先頭に生成されます（カバー画像がある場合は、カバーページの直後に改ページされて出力されます）。
 - ✂️ **H1（大見出し）直前での自動物理分割**: Markdown内のすべての `<h1>`（`# ` 見出し）の直前でXHTMLファイルを自動分割します。これにより、ほぼすべてのEPUBリーダーで確実に見出しの直前での改ページが行われます。
+- 📊 **美しいテーブル（表）の表示**: はっきりした外枠ボーダー、十分な下部余白、コントラストが明瞭なゼブラストライプ（行ごとの背景色の色分け）をデフォルトスタイルとして定義。**さらに、日本語の縦書きモード（`rtl`）でテーブルが崩れるのを防ぐため、テーブル要素のみ自動的に横書き（`writing-mode: horizontal-tb`）に上書きして表示する最適化を施しています。**
 - ✍️ **縦書き・横書き両対応**: 横書き（`ltr`）だけでなく、日本語書籍で一般的な縦書き（`rtl`）表示に対応しています。縦書き指定時は、文字送り方向だけでなく、明朝体フォントへの自動切り替えや見出し・引用文（blockquote）の余白・枠線も自動的に最適化されます。
 
 ### インストール方法
