@@ -118,7 +118,7 @@ export async function generateEPub(options: EPubOptions) {
   // カバー画像の処理
   if (options.coverPath) {
     const coverFullPath = path.resolve(options.coverPath);
-    let coverBuffer = await fs.readFile(coverFullPath);
+    let coverBuffer: any = await fs.readFile(coverFullPath);
     let coverExt = path.extname(coverFullPath).toLowerCase();
     let coverMediaType = mime.lookup(coverFullPath) || "image/jpeg";
 
@@ -192,7 +192,7 @@ export async function generateEPub(options: EPubOptions) {
 
     try {
       const imgFullPath = path.resolve(markdownDir, originalSrc);
-      let imgBuffer = await fs.readFile(imgFullPath);
+      let imgBuffer: any = await fs.readFile(imgFullPath);
       let imgExt = path.extname(imgFullPath).toLowerCase();
       let imgMediaType = mime.lookup(imgFullPath) || "image/jpeg";
 
