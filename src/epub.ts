@@ -118,10 +118,22 @@ export async function generateEPub(options: EPubOptions) {
   // カバー画像の処理
   if (options.coverPath) {
     const coverFullPath = path.resolve(options.coverPath);
-    const coverBuffer = await fs.readFile(coverFullPath);
-    const coverExt = path.extname(coverFullPath);
+    let coverBuffer = await fs.readFile(coverFullPath);
+    let coverExt = path.extname(coverFullPath).toLowerCase();
+    let coverMediaType = mime.lookup(coverFullPath) || "image/jpeg";
+
+    if (coverExt === ".png") {
+      try {
+        const sharp = (await import("sharp")).default;
+        coverBuffer = await sharp(coverBuffer).jpeg({ quality: 90 }).toBuffer();
+        coverExt = ".jpg";
+        coverMediaType = "image/jpeg";
+      } catch (err) {
+        console.warn("Warning: Failed to convert cover PNG to JPG, using original PNG.", err);
+      }
+    }
+
     const coverFileName = `cover${coverExt}`;
-    const coverMediaType = mime.lookup(coverFullPath) || "image/jpeg";
 
     zip.file(`OEBPS/images/${coverFileName}`, coverBuffer);
     manifestItems.push({
@@ -131,7 +143,7 @@ export async function generateEPub(options: EPubOptions) {
       properties: "cover-image",
     });
 
-    // カバー用XHTMLの追加
+    // カバー用XHTML of 追加
     const coverHtml = getCoverXhtml(epubMeta, `../images/${coverFileName}`);
     zip.file("OEBPS/text/cover.xhtml", coverHtml);
     manifestItems.push({
@@ -180,10 +192,22 @@ export async function generateEPub(options: EPubOptions) {
 
     try {
       const imgFullPath = path.resolve(markdownDir, originalSrc);
-      const imgBuffer = await fs.readFile(imgFullPath);
-      const imgExt = path.extname(imgFullPath);
+      let imgBuffer = await fs.readFile(imgFullPath);
+      let imgExt = path.extname(imgFullPath).toLowerCase();
+      let imgMediaType = mime.lookup(imgFullPath) || "image/jpeg";
+
+      if (imgExt === ".png") {
+        try {
+          const sharp = (await import("sharp")).default;
+          imgBuffer = await sharp(imgBuffer).jpeg({ quality: 90 }).toBuffer();
+          imgExt = ".jpg";
+          imgMediaType = "image/jpeg";
+        } catch (err) {
+          console.warn(`Warning: Failed to convert PNG to JPG for ${originalSrc}, using original PNG.`, err);
+        }
+      }
+
       const epubImgName = `img_${imgIndex}${imgExt}`;
-      const imgMediaType = mime.lookup(imgFullPath) || "image/jpeg";
 
       zip.file(`OEBPS/images/${epubImgName}`, imgBuffer);
       manifestItems.push({
