@@ -116,6 +116,54 @@ img {
   page-break-inside: avoid;
 }
 
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.95em;
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid #dddddd;
+  padding: 0.6em 0.8em;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Dark Mode for Tables */
+@media (prefers-color-scheme: dark) {
+  th, td {
+    border-color: #444444;
+  }
+  th {
+    background-color: #2a2a2a;
+  }
+  tr:nth-child(even) {
+    background-color: #1a1a1a;
+  }
+}
+
+/* Vertical writing mode override for tables */
+html.vertical table {
+  writing-mode: horizontal-tb;
+  -epub-writing-mode: horizontal-tb;
+  -webkit-writing-mode: horizontal-tb;
+  width: auto;
+  max-width: 100%;
+  margin: 1.5em auto;
+}
+
+
 /* Table of contents page styles (if generated inside the book) */
 .toc-title {
   text-align: center;
